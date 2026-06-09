@@ -1,6 +1,7 @@
 from pip._internal.cli import status_codes
 
 from schema.response import TodoResponse
+from schema.request import TodoCreateRequest
 from fastapi import FastAPI, status, HTTPException
 
 app = FastAPI()
@@ -25,3 +26,16 @@ def get_todo_handler(todo_id: int):
         if todo["id"] == todo_id:
             return todo
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo Not found")
+
+# 할 일 생성
+
+# POST API 생성
+@app.post("/todos", response_model=TodoResponse, status_code=status.HTTP_201_CREATED)
+def create_todo_handler(body: TodoCreateRequest): # 요청 본문 매개변수로 받기
+    new_todo = { # 새 할 일 데이터 생성
+        "id": len(todos) + 1,
+        "title": body.title,
+        "is_done": body.is_done,
+    }
+    todos.append(new_todo) # 리스트에 새 할 일 추가 후 응답 반환
+    return new_todo
