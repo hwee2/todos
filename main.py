@@ -1,7 +1,7 @@
 from pip._internal.cli import status_codes
 
 from schema.response import TodoResponse
-from schema.request import TodoCreateRequest
+from schema.request import TodoCreateRequest, TodoUpdateRequest
 from fastapi import FastAPI, status, HTTPException
 
 app = FastAPI()
@@ -40,4 +40,23 @@ def create_todo_handler(body: TodoCreateRequest): # 요청 본문 매개변수�
     todos.append(new_todo) # 리스트에 새 할 일 추가 후 응답 반환
     return new_todo
 
-#
+# 할 일 수정
+@app.patch("todos/{todo_id}", response_model=TodoResponse, status_code=status.HTTP_200_OK)
+def update_todo_handler(todo_id: int, body: TodoUpdateRequest):
+    for todo in todos:
+        if todo["id"] == todo_id:
+            if body.title is not None:
+                todo["title"] = body.title
+            if body.is_done is not None:
+                todo["is_done"] = body.is_done
+            return todo
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo Not found")
+
+# 할 일 삭제
+@app.delete("/todos/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_todo_handler(todo_id: int):
+    for todo in todos:
+        if todo["id"] == todo_id:
+            todos.remove(todo)
+            return
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo Not found")
