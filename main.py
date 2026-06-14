@@ -1,8 +1,10 @@
-from pip._internal.cli import status_codes
-
 from schema.response import TodoResponse
 from schema.request import TodoCreateRequest, TodoUpdateRequest
 from fastapi import FastAPI, status, HTTPException
+from database.db_connection import engine
+from database.orm import Base
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
