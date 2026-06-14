@@ -5,9 +5,9 @@ from database.orm import Base
 class Todo(Base):
     __tablename__ = 'todo' # 테이블 이름
 
-    id = Mapped[int] = mapped_column(Integer, primary_key=True,autoincrement=True)
+    id : Mapped[int] = mapped_column(Integer, primary_key=True,autoincrement=True)
 
-    tite = Mapped[String] = mapped_column(String(255), nullable=False)
+    tite : Mapped[String] = mapped_column(String(255), nullable=False)
 
-    is_done = Mapped[Boolean] = mapped_column(Boolean,nullable=False,default=False)
+    is_done : Mapped[Boolean] = mapped_column(Boolean,nullable=False,default=False)
 
