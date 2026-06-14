@@ -3,6 +3,7 @@ from schema.request import TodoCreateRequest, TodoUpdateRequest
 from fastapi import FastAPI, status, HTTPException
 from database.db_connection import engine
 from database.orm import Base
+from models import Todo
 
 Base.metadata.create_all(bind=engine)
 
