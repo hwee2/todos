@@ -7,7 +7,7 @@ class Todo(Base):
 
     id : Mapped[int] = mapped_column(Integer, primary_key=True,autoincrement=True)
 
-    tite : Mapped[String] = mapped_column(String(255), nullable=False)
+    title : Mapped[String] = mapped_column(String(255), nullable=False)
 
     is_done : Mapped[Boolean] = mapped_column(Boolean,nullable=False,default=False)
 
