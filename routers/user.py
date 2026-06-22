@@ -8,7 +8,7 @@ from auth.password import hash_password
 router = APIRouter(tags=["User"])
 
 # 회원가입
-@router.post("/users/signup", status_code=status.HTTP_201_CREATED)
+@router.post("/users/signup", status_code=status.HTTP_201_CREATED, response_model=UserSignRequest)
 
 def signup_user_handler(body: UserSignRequest):
     # 이메일 중복 검사
@@ -18,16 +18,17 @@ def signup_user_handler(body: UserSignRequest):
         if existing_user :
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="이미 사용 중인 이메일입니다.")
 
-    # 비밀번호 해시 생성
-    hashed_password = hash_password(body.password)
+        # 비밀번호 해시 생성
+        hashed_password = hash_password(body.password)
 
-    """
-    회원가입 처리 과정
-    1. 요청 데이터 검증
-    2. 이메일 중복 검사
-    3. 비밀번호 해시 생성
-    4. User 모델 생성 후 DB 저장
-    5. 응답 반환
+        #User 모델 생성 후 DB 저장
+        user = User(
+            email = str(body.email),
+            hashed_password = hashed_password,
+        )
+        session.add(user)
+        session.commit()
 
-    """
-    pass
+        # 응답 반환
+        session.refresh(user) #DB에서 생성된 값(id, created_at) 반영
+        return user #회원가입 결과 반환
