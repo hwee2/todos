@@ -4,7 +4,7 @@ from pwdlib import PasswordHash
 password_hash = PasswordHash.recommended()
 
 # 2 평문 비밀번호를 해시 문자열로 변환
-def hash_password(plain_password: str):
+def hash_password(plain_password: str) -> str:
     return password_hash.hash(plain_password)
 
 # 평문 비밀번호와 해시값 비교
