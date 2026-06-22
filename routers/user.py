@@ -3,6 +3,7 @@ from sqlalchemy import select
 from schema.request import UserSignRequest
 from database.db_connection import SessionFactory
 from models import User
+from auth.password import hash_password
 
 router = APIRouter(tags=["User"])
 
@@ -16,6 +17,10 @@ def signup_user_handler(body: UserSignRequest):
         existing_user = session.scalars(stmt)
         if existing_user :
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="이미 사용 중인 이메일입니다.")
+
+    # 비밀번호 해시 생성
+    hashed_password = hash_password(body.password)
+
     """
     회원가입 처리 과정
     1. 요청 데이터 검증
