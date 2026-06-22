@@ -29,4 +29,7 @@ class UserSignRequest(BaseModel):
             raise ValueError("비밀번호에는 특수문자가 최소 1개 포함되어야 합니다.")
         return value
 
-
+# 로그인 요청 모델
+class UserLoginRequest(BaseModel):
+    email: EmailStr = Field(..., description="사용자 이메일 주소")
+    password: str = Field(..., min_length=8, description="사용자 비밀번호(평문입력)")
