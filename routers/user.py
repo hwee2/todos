@@ -1,5 +1,7 @@
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, HTTPException, Request
 from sqlalchemy import select
+from sqlalchemy.sql.functions import user
+
 from schema.request import UserSignRequest, UserLoginRequest
 from database.db_connection import SessionFactory
 from models import User
@@ -36,18 +38,24 @@ def signup_user_handler(body: UserSignRequest):
 
 # 로그인(세션 방식)
 @router.post("/users/login", status_code=status.HTTP_200_OK)
-def login_user_handler(body: UserLoginRequest):
+def login_user_handler(request: Request, body: UserLoginRequest):
     with SessionFactory() as session:
         stmt = select(User).where(User.email == body.email)
         user = session.scalar(stmt)
 
+        # 사용자 존재 여부
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="이메일 또는 비밀번호가 올바르지 않습니다."
             )
+
+        # 비밀번호 검증
         if not verify_password(body.password, user.hashed_password):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="이메일 또는 비밀번호가 올바르지 않습니다."
             )
+
+    request.session["user_id"] = user.id
+    return {"message": "로그인 성공"}
