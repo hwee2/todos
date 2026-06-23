@@ -6,6 +6,7 @@ class TodoResponse(BaseModel):
     id : int
     title : str
     is_done : bool
+    user_id : int | None
 
 # 회원가입 응답 모델
 class UserSignUpResponse(BaseModel):
