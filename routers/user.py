@@ -59,3 +59,9 @@ def login_user_handler(request: Request, body: UserLoginRequest):
 
     request.session["user_id"] = user.id
     return {"message": "로그인 성공"}
+
+# 로그아웃
+@router.post("/users/logout", status_code=status.HTTP_200_OK)
+def logout_user_handler(request: Request):
+    request.session.clear()
+    return {"message": "로그아웃 완료"}
