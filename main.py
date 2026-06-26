@@ -4,6 +4,13 @@ from database.orm import Base
 from routers.todo import router as todo_router
 from routers.user import router as user_router
 from starlette.middleware.sessions import SessionMiddleware
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan():
+    Base.metadata.create_all(blind=engine)
+    yield
+app = FastAPI(lifespan=lifespan)
 
 Base.metadata.create_all(bind=engine)
 
