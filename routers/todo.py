@@ -1,7 +1,6 @@
-from fastapi import HTTPException, APIRouter, Request, Depends
+from fastapi import HTTPException, APIRouter, Request, Depends, UploadFile, File
 from sqlalchemy import select
 from starlette import status
-
 from database.db_connection import SessionFactory
 from models import Todo
 from schema.request import TodoCreateRequest, TodoUpdateRequest
@@ -9,10 +8,15 @@ from schema.response import TodoResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from auth.jwt import decode_access_token
 from database.db_connection import SessionFactory, get_session
+from auth.jwt import decode_access_token
+from pathlib import Path
+import shutil
+from fastapi.responses import FileResponse
 
 
 router = APIRouter(tags=["Todo"])
 bearer = HTTPBearer(auto_error=False)
+UPLOAD_DIR = Path("uploads")
 
 # 전체 할 일 조회
 @router.get("/todos", response_model=list[TodoResponse], status_code=status.HTTP_200_OK)
@@ -112,3 +116,22 @@ def delete_todo_handler(todo_id: int, session = Depends(get_session), authorizat
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Todo Not found") # 조회 실패 시 예외 처리
     # finally:
     #     session.close()
+
+# 파일 업로드
+@router.post("/upload")
+def upload_file(file: UploadFile=File(...)):
+    UPLOAD_DIR.mkdir(exist_ok=True)
+    file_path = UPLOAD_DIR / file.filename
+    with file_path.open("wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    return {"filename": file.filename}
+
+# 파일 다운로드
+@router.get("/download/{filename}")
+def download_file(filename: str):
+    file_path = UPLOAD_DIR / filename
+    return FileResponse(
+        path=file_path,
+        filename=filename,
+        media_type="application/octet-stream"
+    )
